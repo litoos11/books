@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsuarioRepository } from './usuario.repository';
-import { MapperService } from 'src/shared/mapper.service';
 import { UsuarioDto } from './dto/usuario.dto';
 import { Usuario } from './usuario.entity';
 import { UsuarioDetalles } from './usuario.detalles.entity';
@@ -12,11 +11,10 @@ import { Rol } from '../rol/rol.entity';
 export class UsuariosService {
 	constructor(
 		@InjectRepository(UsuarioRepository)
-		private readonly _usuarioRepository: UsuarioRepository,
-		private readonly _mappperService: MapperService
+		private readonly _usuarioRepository: UsuarioRepository
 	) { }
 
-	async getById(id: number): Promise<UsuarioDto> {
+	async getById(id: number): Promise<Usuario> {
 		if(!id){
 			throw new BadRequestException("El id es requerido!");
 		}
@@ -28,17 +26,17 @@ export class UsuariosService {
 
 		}
 
-		return this._mappperService.map<Usuario, UsuarioDto>(usuario, new UsuarioDto());
+		return usuario;
 	}
 
-	async getAll(): Promise<UsuarioDto[]> {
+	async getAll(): Promise<Usuario[]> {
 	
 		const usuarios: Usuario[] = await this._usuarioRepository.find({where: {status: 'ACTIVE'} });
 
-		return this._mappperService.mapCollection<Usuario, UsuarioDto>(usuarios, new UsuarioDto());
+		return usuarios;
 	}
 
-	async create(usuario: Usuario): Promise<UsuarioDto>{
+	async create(usuario: Usuario): Promise<Usuario>{
 		const usuarioDetalles = new UsuarioDetalles();
 		usuario.detalles = usuarioDetalles;
 
@@ -48,10 +46,10 @@ export class UsuariosService {
 
 		const saveUsuario: Usuario = await this._usuarioRepository.save(usuario);
 
-		return this._mappperService.map<Usuario, UsuarioDto>(saveUsuario, new UsuarioDto());
+		return saveUsuario;
 	}
 
-	async update(id: number, usuario: Usuario): Promise<UsuarioDto>{
+	async update(id: number, usuario: Usuario): Promise<Usuario>{
 		//await this._usuarioRepository.update(id, usuario);
 		const usuarioEncontrado: Usuario =  await this._usuarioRepository.findOne(id);
 		if(usuarioEncontrado){
