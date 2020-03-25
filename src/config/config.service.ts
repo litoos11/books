@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { parse } from 'dotenv';
 
 export class ConfigService {
-	private readonly envConfig: { [key: string]: string | number };
+	private readonly envConfig: { [key: string]: any };
 
 	constructor(){
 		const isDevelopmentEnv = process.env.NODE_ENV !== "production";
@@ -25,7 +25,7 @@ export class ConfigService {
 		}
 	}
 
-	get(key: string): string | number{
+	get(key: string): any { 
 		return this.envConfig[key];
 	}
 }
